@@ -52,6 +52,10 @@ module.exports = {
 			})
 			.then((result) => {
 				const accessToken = oauth2.accessToken.create(result);
+				if (!accessToken.token.access_token) {
+					console.error('Failed to retrieve AT from GitHub', accessToken);
+					return callback(null, { statusCode: 500, body: 'An error occured!' });
+				}
 				return callback(null, {
 					statusCode: 200,
 					body: `<html>
