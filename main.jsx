@@ -45,7 +45,7 @@ function useGithubAuth() {
   function openLoginWindow() {
     if (!loginWindow) {
       const win = window.open(
-        `https://github.com/login/oauth/authorize?client_id=bef8f01982247883d379&redirect_url=${window.location.protocol}://${window.location.host}/.netlify/functions/auth&scope=read:org,repo`,
+        '/.netlify/functions/auth',
         "_blank",
         "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no",
       );

@@ -32,7 +32,7 @@ module.exports = {
 						<body>
 							Logging in with GitHub, hang in there!
 							<script>
-								window.location.href = 'https://github.com/login/oauth/authorize?client_id=${backendSimpleConfig.client.id}&redirect_url='+window.location.href+'&scope=org,repo'
+								window.location.href = 'https://github.com/login/oauth/authorize?client_id=${backendSimpleConfig.client.id}&redirect_url='+window.location.href+'&scope=read:org,repo'
 							</script>
 						</body>
 					</html>`,
@@ -66,8 +66,7 @@ module.exports = {
 				});
 			})
 			.catch((error) => {
-				console.log("Access Token Error", error.message);
-				console.log(error);
+				console.log("Access Token Error", error);
 				return callback(null, {
 					statusCode: error.statusCode || 500,
 					body: JSON.stringify({
