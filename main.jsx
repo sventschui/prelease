@@ -14,6 +14,10 @@ window.handleToken = (token) => {
   atEmitter.emit('change', token);
   window.sessionStorage.setItem('prelease:access-token', token);
 }
+window.handleTokenError = (token) => {
+  // use a ref since this is called async and setAccessToken is/might be stale...
+  atEmitter.emit('error', token);
+}
 
 // TODO: find a way for a silent login...
 /*
@@ -39,10 +43,13 @@ function buildSilentLoginView(atOrNull) {
 
 function useGithubAuth() {
   const [accessToken, setAccessToken] = useState(currentAccessToken);
+  const [error, setError] = useState(null);
+  const [loggingIn, setLoggingIn] = useState(false);
   const loggedIn = useMemo(() => !!accessToken, [accessToken]);
   const loginWindowRef = useRef();
   useEffect(() => {
-    function handle(at) {
+    function handle() {
+      setLoggingIn(false)
       if (loginWindowRef.current) { 
         loginWindowRef.current.close()
         loginWindowRef.current = null
@@ -59,15 +66,12 @@ function useGithubAuth() {
   }, [accessToken])
 
   useEffect(() => {
-    function onAtChange(at) {
-      setAccessToken(at);
-      // setSilentLoginView(buildLoginView(at))
-    }
-
-    atEmitter.on('change', onAtChange);
+    atEmitter.on('change', setAccessToken);
+    atEmitter.on('error', setError);
 
     return () => {
-      atEmitter.off('change', onAtChange)
+      atEmitter.off('change', setAccessToken)
+      atEmitter.off('error', setError);
     }
   }, [setAccessToken])
 
@@ -79,7 +83,9 @@ function useGithubAuth() {
         "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no",
       );
       if (loginWindowRef.current) {
+        setLoggingIn(true)
         function onWindowClose() {
+          setLoggingIn(false)
           loginWindowRef.current = null
         }
         loginWindowRef.current.addEventListener('close', onWindowClose)
@@ -96,12 +102,13 @@ function useGithubAuth() {
     // silentLoginView,
     accessToken,
     openLoginWindow,
-    loginWindowRef,
+    loggingIn,
+    error,
   };
 }
 
 function Main(props) {
-  const { loggedIn, accessToken, loginWindowRef, openLoginWindow } = useGithubAuth();
+  const { loggingIn, accessToken, openLoginWindow, error } = useGithubAuth();
   const client = useMemo(() => {
     if (!accessToken) {
       return null;
@@ -127,10 +134,14 @@ function Main(props) {
           </Provider>
         </AccessTokenContext.Provider>
       ) : (
-        loginWindowRef.current ? (
-          <p class="text-center mx-auto my-8">Signing you in with GitHub...</p>
+        error ? (
+          <p class="text-center mx-auto my-8">Login failed :(</p>
         ) : (
-          <button class="mx-auto block my-8 bg-white text-indigo-800 rounded px-4 py-2" onClick={openLoginWindow} >Sign in</button>
+          loggingIn ? (
+            <p class="text-center mx-auto my-8">Signing you in with GitHub...</p>
+          ) : (
+            <button class="mx-auto block my-8 bg-white text-indigo-800 rounded px-4 py-2" onClick={openLoginWindow} >Sign in</button>
+          )
         )
       )}
     </>
