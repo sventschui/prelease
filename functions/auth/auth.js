@@ -10,8 +10,9 @@ const config = {
 		tokenPath: '/login/oauth/access_token',
 		authorizePath: '/login/ouath/authorized',
 	},
-	redirect_uri: process.env.REDIRECT_URI || 'http://localhost:8888/.netlify/functions/auth',
 };
+
+const redirect_uri = process.env.REDIRECT_URI || 'http://localhost:8888/.netlify/functions/auth';
 
 if (!config.client.secret) {
 	throw new Error("MISSING REQUIRED ENV VARS. Please set CLIENT_SECRET");
@@ -31,7 +32,7 @@ module.exports = {
 						<body>
 							Logging in with GitHub, hang in there!
 							<script>
-								window.location.href = 'https://github.com/login/oauth/authorize?client_id=${config.client.id}&redirect_url=${encodeURIComponent(config.redirect_uri)}&scope=read:org,repo'
+								window.location.href = 'https://github.com/login/oauth/authorize?client_id=${config.client.id}&redirect_url=${encodeURIComponent(redirect_uri)}&scope=read:org,repo'
 							</script>
 						</body>
 					</html>`,
@@ -43,16 +44,27 @@ module.exports = {
 		oauth2.authorizationCode
 			.getToken({
 				code,
-				redirect_uri: config.redirect_uri,
+				redirect_uri: redirect_uri,
 				client_id: config.client.id,
 				client_secret: config.client.secret,
 			})
 			.then((result) => {
 				const accessToken = oauth2.accessToken.create(result);
 				if (!accessToken.token.access_token) {
-					console.error('Failed to retrieve AT from GitHub', accessToken);
-					return callback(null, { statusCode: 500, body: 'An error occured!' });
+					return callback(null, {
+						statusCode: 200,
+						body: `<html>
+								<body>
+									Getting you back to prelease, hang in there!
+									<script>
+										window.opener.handleTokenError(${JSON.stringify(accessToken.token)});
+										window.close();
+									</script>
+								</body>
+							</html>`,
+					});
 				}
+
 				return callback(null, {
 					statusCode: 200,
 					body: `<html>
