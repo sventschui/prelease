@@ -9,13 +9,10 @@ import AccessTokenContext from './src/AccessTokenContext';
 
 const atEmitter = mitt();
 let currentAccessToken = window.sessionStorage.getItem('prelease:access-token');
-let loginWindow = null;
 window.handleToken = (token) => {
   // use a ref since this is called async and setAccessToken is/might be stale...
   atEmitter.emit('change', token);
   window.sessionStorage.setItem('prelease:access-token', token);
-  loginWindow.close();
-  loginWindow = null;
 }
 
 // TODO: find a way for a silent login...
@@ -44,6 +41,27 @@ function useGithubAuth() {
   const [accessToken, setAccessToken] = useState(currentAccessToken);
   // const [silentLoginView, setSilentLoginView] = useState(buildSilentLoginView(accessToken));
   const loggedIn = useMemo(() => !!accessToken, [accessToken]);
+  const [loginWindow, setLoginWindow] = useState(null);
+  function openLoginWindow() {
+    if (!loginWindow) {
+      const win = window.open(
+        `https://github.com/login/oauth/authorize?client_id=bef8f01982247883d379&redirect_url=${window.location.protocol}://${window.location.host}/.netlify/functions/auth&scope=read:org,repo`,
+        "_blank",
+        "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no",
+      );
+      setLoginWindow(win);
+      if (win) {
+        // TODO: proper unsusbcribing from event emitters...
+        win.on('close', () => {
+          setLoginWindow(null)
+        })
+        atEmitter.once('change', () => {
+          loginWindow.close();
+          setLoginWindow(null);
+        })
+      }
+    }
+  }
   useEffect(() => {
     function onAtChange(at) {
       setAccessToken(at);
@@ -57,22 +75,20 @@ function useGithubAuth() {
     }
   })
   if (!accessToken && !loginWindow) {
-    loginWindow = window.open(
-      'https://github.com/login/oauth/authorize?client_id=bef8f01982247883d379&redirect_url=http://localhost:8080/.netlify/functions/auth&scope=read:org,repo',
-      "_blank",
-      "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no",
-    );
+    openLoginWindow();
   }
 
   return {
     loggedIn,
     // silentLoginView,
     accessToken,
+    openLoginWindow,
+    loginWindow,
   };
 }
 
 function Main(props) {
-  const { loggedIn, accessToken } = useGithubAuth();
+  const { loggedIn, accessToken, loginWindow, openLoginWindow } = useGithubAuth();
   const client = useMemo(() => {
     if (!accessToken) {
       return null;
@@ -91,12 +107,18 @@ function Main(props) {
     <>
       <h1 class="text-5xl text-center">prelease!</h1>
       <p class="text-sm text-center">please release, preact release, painless release, prelease! 🤣</p>
-      {client && (
+      {client ? (
         <AccessTokenContext.Provider value={accessToken} >
           <Provider value={client} >
             <App />
           </Provider>
         </AccessTokenContext.Provider>
+      ) : (
+        loginWindow ? (
+          <p class="text-center mx-auto my-8">Signing you in with GitHub...</p>
+        ) : (
+          <button class="mx-auto block my-8 bg-white text-indigo-800 rounded px-4 py-2" onClick={openLoginWindow} >Sign in</button>
+        )
       )}
     </>
   )
