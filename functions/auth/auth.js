@@ -1,6 +1,6 @@
 const simpleOauth = require("simple-oauth2");
 
-const backendSimpleConfig = {
+const config = {
 	client: {
 		id: process.env.CLIENT_ID,
 		secret: process.env.CLIENT_SECRET,
@@ -10,20 +10,19 @@ const backendSimpleConfig = {
 		tokenPath: '/login/oauth/access_token',
 		authorizePath: '/login/ouath/authorized',
 	},
+	redirect_uri: process.env.REDIRECT_URI || 'http://localhost:8888/.netlify/functions/auth',
 };
 
-if (!backendSimpleConfig.client.secret) {
+if (!config.client.secret) {
 	throw new Error("MISSING REQUIRED ENV VARS. Please set CLIENT_SECRET");
 }
 
-const oauth2 = simpleOauth.create(backendSimpleConfig);
+const oauth2 = simpleOauth.create(config);
 
 /* Function to handle intercom auth callback */
 module.exports = {
 	handler(event, context, callback) {
 		const code = event.queryStringParameters.code;
-		/* state helps mitigate CSRF attacks & Restore the previous state of your app */
-		const state = event.queryStringParameters.state;
 
 		if (!code) {
 			callback(null, {
@@ -32,7 +31,7 @@ module.exports = {
 						<body>
 							Logging in with GitHub, hang in there!
 							<script>
-								window.location.href = 'https://github.com/login/oauth/authorize?client_id=${backendSimpleConfig.client.id}&redirect_url='+window.location.href+'&scope=read:org,repo'
+								window.location.href = 'https://github.com/login/oauth/authorize?client_id=${config.client.id}&redirect_url=${encodeURIComponent(config.redirect_uri)}&scope=read:org,repo'
 							</script>
 						</body>
 					</html>`,
@@ -40,15 +39,13 @@ module.exports = {
 			return;
 		}
 
-		console.log('got code!', code);
-
 		/* Take the grant code and exchange for an accessToken */
 		oauth2.authorizationCode
 			.getToken({
 				code,
-				redirect_uri: 'http://localhost:8888/.netlify/functions/auth',
-				client_id: backendSimpleConfig.client.id,
-				client_secret: backendSimpleConfig.client.secret,
+				redirect_uri: config.redirect_uri,
+				client_id: config.client.id,
+				client_secret: config.client.secret,
 			})
 			.then((result) => {
 				const accessToken = oauth2.accessToken.create(result);
