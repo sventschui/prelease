@@ -1,6 +1,6 @@
 import { render } from 'preact'
 import 'preact/devtools';
-import { useState, useMemo, useEffect } from 'preact/hooks';
+import { useState, useMemo, useEffect, useRef } from 'preact/hooks';
 import mitt from 'mitt';
 import { createClient, defaultExchanges, Provider } from '@urql/preact';
 import './index.css'
@@ -39,28 +39,25 @@ function buildSilentLoginView(atOrNull) {
 
 function useGithubAuth() {
   const [accessToken, setAccessToken] = useState(currentAccessToken);
-  // const [silentLoginView, setSilentLoginView] = useState(buildSilentLoginView(accessToken));
   const loggedIn = useMemo(() => !!accessToken, [accessToken]);
-  const [loginWindow, setLoginWindow] = useState(null);
-  function openLoginWindow() {
-    if (!loginWindow) {
-      const win = window.open(
-        '/.netlify/functions/auth',
-        "_blank",
-        "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no",
-      );
-      setLoginWindow(win);
-      if (win) {
-        win.addEventListener('close', () => {
-          setLoginWindow(null)
-        })
-        atEmitter.on('change', () => {
-          loginWindow.close();
-          setLoginWindow(null);
-        })
+  const loginWindowRef = useRef();
+  useEffect(() => {
+    function handle(at) {
+      if (loginWindowRef.current) { 
+        loginWindowRef.current.close()
+        loginWindowRef.current = null
       }
     }
-  }
+    atEmitter.on('change', handle);
+    return () => { atEmitter.off('change', handle); }
+  }, [])
+
+  useEffect(() => {
+    if (!accessToken && !loginWindowRef.current) {
+      return openLoginWindow()
+    }
+  }, [accessToken])
+
   useEffect(() => {
     function onAtChange(at) {
       setAccessToken(at);
@@ -72,9 +69,26 @@ function useGithubAuth() {
     return () => {
       atEmitter.off('change', onAtChange)
     }
-  })
-  if (!accessToken && !loginWindow) {
-    openLoginWindow();
+  }, [setAccessToken])
+
+  function openLoginWindow() {
+    if (!loginWindowRef.current) {
+      loginWindowRef.current = window.open(
+        '/.netlify/functions/auth',
+        "_blank",
+        "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no",
+      );
+      if (loginWindowRef.current) {
+        function onWindowClose() {
+          loginWindowRef.current = null
+        }
+        loginWindowRef.current.addEventListener('close', onWindowClose)
+
+        // keep a reference to the window even if loginWindowRef.current is wiped
+        const win = loginWindowRef.current;
+        return () => { win.removeEventListener('close', onWindowClose) }
+      }
+    }
   }
 
   return {
@@ -82,12 +96,12 @@ function useGithubAuth() {
     // silentLoginView,
     accessToken,
     openLoginWindow,
-    loginWindow,
+    loginWindowRef,
   };
 }
 
 function Main(props) {
-  const { loggedIn, accessToken, loginWindow, openLoginWindow } = useGithubAuth();
+  const { loggedIn, accessToken, loginWindowRef, openLoginWindow } = useGithubAuth();
   const client = useMemo(() => {
     if (!accessToken) {
       return null;
@@ -113,7 +127,7 @@ function Main(props) {
           </Provider>
         </AccessTokenContext.Provider>
       ) : (
-        loginWindow ? (
+        loginWindowRef.current ? (
           <p class="text-center mx-auto my-8">Signing you in with GitHub...</p>
         ) : (
           <button class="mx-auto block my-8 bg-white text-indigo-800 rounded px-4 py-2" onClick={openLoginWindow} >Sign in</button>
