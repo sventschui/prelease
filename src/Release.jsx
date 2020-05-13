@@ -3,6 +3,8 @@ import { useState, useEffect, useRef, useMemo, useContext, useReducer } from 'p
 import Commits from './Commits';
 import { valid as semverValid, clean as semverClean, inc as semverInc, prerelease as semverPrerelease } from 'es-semver';
 import AccessTokenContext from './AccessTokenContext';
+// TODO: importing this from node modules is broken...
+// How is this reflected in the dist build?!
 import { MarkdownIt } from 'https://unpkg.com/esm.markdown-it@8.5.0/esm.markdown-it.esm.js';
 import Logo from './Logo';
 
@@ -236,7 +238,7 @@ function ReleaseForm({ login, repo, branch, pkgJson, latestCommit }) {
                 {
                     releaseType && (
                         releaseType === 'custom'
-                        ? <>
+                        ? <div>
                                 <input
                                     value={version}
                                     onInput={(e) => { setVersion(e.target.value) }}
@@ -248,7 +250,7 @@ function ReleaseForm({ login, repo, branch, pkgJson, latestCommit }) {
                                 <span class="block h-4 text-sm" >
                                     {!validSemver && 'Please provide a valid semver'}
                                 </span>
-                            </>
+                            </div>
                     : <span class={`rounded px-4 py-2 text-white`}>{version}</span>
                     )
                 }
