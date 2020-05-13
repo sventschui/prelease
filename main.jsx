@@ -51,11 +51,10 @@ function useGithubAuth() {
       );
       setLoginWindow(win);
       if (win) {
-        // TODO: proper unsusbcribing from event emitters...
         win.addEventListener('close', () => {
           setLoginWindow(null)
         })
-        atEmitter.once('change', () => {
+        atEmitter.on('change', () => {
           loginWindow.close();
           setLoginWindow(null);
         })
