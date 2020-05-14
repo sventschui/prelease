@@ -6,7 +6,19 @@
     "dev:vite": "vite --jsx preact",
     "build": "vite build --jsx preact",
     "dev:dist": "CLIENT_ID=bef8f01982247883d379 CLIENT_SECRET=0288a6a278515ba6260398764de7f1fc1c1ae452 netlify dev -c 'yarn serve:dist'",
-    "serve:dist": "serve --single --listen 3000 dist/"
+    "serve:dist": "serve --single --listen 3000 dist/",
+    "pretty": "prettier --write '**/*.jsx' '**/*.js'"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write"
+    ],
+    "*.jsx": [
+      "prettier --write"
+    ]
   },
   "browserslist": "> 1%, last 2 versions",
   "dependencies": {
@@ -22,13 +34,16 @@
     "es-semver": "^1.0.1",
     "esm.markdown-it": "^8.5.0",
     "graphql": "^15.0.0",
+    "lint-staged": "^10.2.2",
     "mitt": "^1.2.0",
     "netlify-cli": "^2.50.0",
     "preact": "^10.4.1",
     "preact-router": "^3.2.1",
+    "prettier": "^2.0.5",
     "rollup-plugin-visualizer": "^4.0.4",
     "serve": "^11.3.0",
     "tailwindcss": "^1.4.6",
-    "vite": "sventschui/vite#feature/prioritize-mjs-files-with-dist"
+    "vite": "sventschui/vite#feature/prioritize-mjs-files-with-dist",
+    "yorkie": "^2.0.0"
   }
 }

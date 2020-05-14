@@ -1,14 +1,14 @@
 import prefresh from "@prefresh/vite";
 import { parse } from "graphql";
-import path from 'path';
+import path from "path";
 
 const analyze = Boolean(process.env.ANALYZE);
 
 export default {
-    alias: {
-        // TODO: get rid of relative path...
-        'graphql/language/parser': '../../../../graphql-parser-noop.js',
-    },
+  alias: {
+    // TODO: get rid of relative path...
+    "graphql/language/parser": "../../../../graphql-parser-noop.js",
+  },
   plugins: [
     prefresh(),
     {
@@ -48,10 +48,13 @@ export default {
         "process.env.NODE_ENV": '"production"',
         __DEV__: "false",
       }),
-      require('@rollup/plugin-alias')({
+      require("@rollup/plugin-alias")({
         entries: [
-            { find: 'graphql/language/parser', replacement: '../../../../graphql-parser-noop.js' },
-          ]
+          {
+            find: "graphql/language/parser",
+            replacement: "../../../../graphql-parser-noop.js",
+          },
+        ],
       }),
       ...(analyze ? [require("rollup-plugin-visualizer")()] : []),
     ],

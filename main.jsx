@@ -1,22 +1,22 @@
-import { render } from 'preact'
-import 'preact/devtools';
-import { useState, useMemo, useEffect, useRef } from 'preact/hooks';
-import mitt from 'mitt';
-import './index.css'
-import App from './src/App';
-import AccessTokenContext from './src/AccessTokenContext';
+import { render } from "preact";
+import "preact/devtools";
+import { useState, useMemo, useEffect, useRef } from "preact/hooks";
+import mitt from "mitt";
+import "./index.css";
+import App from "./src/App";
+import AccessTokenContext from "./src/AccessTokenContext";
 
 const atEmitter = mitt();
-let currentAccessToken = window.sessionStorage.getItem('prelease:access-token');
+let currentAccessToken = window.sessionStorage.getItem("prelease:access-token");
 window.handleToken = (token) => {
   // use a ref since this is called async and setAccessToken is/might be stale...
-  atEmitter.emit('change', token);
-  window.sessionStorage.setItem('prelease:access-token', token);
-}
+  atEmitter.emit("change", token);
+  window.sessionStorage.setItem("prelease:access-token", token);
+};
 window.handleTokenError = (token) => {
   // use a ref since this is called async and setAccessToken is/might be stale...
-  atEmitter.emit('error', token);
-}
+  atEmitter.emit("error", token);
+};
 
 function useGithubAuth() {
   const [accessToken, setAccessToken] = useState(currentAccessToken);
@@ -26,50 +26,54 @@ function useGithubAuth() {
   const loginWindowRef = useRef();
   useEffect(() => {
     function handle() {
-      setLoggingIn(false)
-      if (loginWindowRef.current) { 
-        loginWindowRef.current.close()
-        loginWindowRef.current = null
+      setLoggingIn(false);
+      if (loginWindowRef.current) {
+        loginWindowRef.current.close();
+        loginWindowRef.current = null;
       }
     }
-    atEmitter.on('change', handle);
-    return () => { atEmitter.off('change', handle); }
-  }, [])
+    atEmitter.on("change", handle);
+    return () => {
+      atEmitter.off("change", handle);
+    };
+  }, []);
 
   useEffect(() => {
     if (!accessToken && !loginWindowRef.current) {
-      return openLoginWindow()
+      return openLoginWindow();
     }
-  }, [accessToken])
+  }, [accessToken]);
 
   useEffect(() => {
-    atEmitter.on('change', setAccessToken);
-    atEmitter.on('error', setError);
+    atEmitter.on("change", setAccessToken);
+    atEmitter.on("error", setError);
 
     return () => {
-      atEmitter.off('change', setAccessToken)
-      atEmitter.off('error', setError);
-    }
-  }, [setAccessToken])
+      atEmitter.off("change", setAccessToken);
+      atEmitter.off("error", setError);
+    };
+  }, [setAccessToken]);
 
   function openLoginWindow() {
     if (!loginWindowRef.current) {
       loginWindowRef.current = window.open(
-        '/.netlify/functions/auth',
+        "/.netlify/functions/auth",
         "_blank",
-        "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no",
+        "height=400,width=400,menubar=no,scrollbars=no,status=no,titlebar=no,toolbar=no"
       );
       if (loginWindowRef.current) {
-        setLoggingIn(true)
+        setLoggingIn(true);
         function onWindowClose() {
-          setLoggingIn(false)
-          loginWindowRef.current = null
+          setLoggingIn(false);
+          loginWindowRef.current = null;
         }
-        loginWindowRef.current.addEventListener('close', onWindowClose)
+        loginWindowRef.current.addEventListener("close", onWindowClose);
 
         // keep a reference to the window even if loginWindowRef.current is wiped
         const win = loginWindowRef.current;
-        return () => { win.removeEventListener('close', onWindowClose) }
+        return () => {
+          win.removeEventListener("close", onWindowClose);
+        };
       }
     }
   }
@@ -90,24 +94,27 @@ function Main() {
   return (
     <>
       <h1 class="text-5xl text-center">prelease!</h1>
-      <p class="text-sm text-center">please release, preact release, painless release, prelease! 🤣</p>
+      <p class="text-sm text-center">
+        please release, preact release, painless release, prelease! 🤣
+      </p>
       {accessToken ? (
-        <AccessTokenContext.Provider value={accessToken} >
+        <AccessTokenContext.Provider value={accessToken}>
           <App />
         </AccessTokenContext.Provider>
+      ) : error ? (
+        <p class="text-center mx-auto my-8">Login failed :(</p>
+      ) : loggingIn ? (
+        <p class="text-center mx-auto my-8">Signing you in with GitHub...</p>
       ) : (
-        error ? (
-          <p class="text-center mx-auto my-8">Login failed :(</p>
-        ) : (
-          loggingIn ? (
-            <p class="text-center mx-auto my-8">Signing you in with GitHub...</p>
-          ) : (
-            <button class="mx-auto block my-8 bg-white text-indigo-800 rounded px-4 py-2" onClick={openLoginWindow} >Sign in</button>
-          )
-        )
+        <button
+          class="mx-auto block my-8 bg-white text-indigo-800 rounded px-4 py-2"
+          onClick={openLoginWindow}
+        >
+          Sign in
+        </button>
       )}
     </>
-  )
+  );
 }
 
-render(<Main />, document.getElementById('app'))
+render(<Main />, document.getElementById("app"));

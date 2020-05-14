@@ -1,3 +1,3 @@
 export function parse() {
-    throw new Error('Stubbed!');
+  throw new Error("Stubbed!");
 }
