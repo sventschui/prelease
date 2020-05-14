@@ -1,7 +1,7 @@
 import prefresh from '@prefresh/vite';
 
 const analyze = Boolean(process.env.ANALYZE);
- 
+
 export default {
     plugins: [prefresh()],
     rollupInputOptions: {

@@ -1,11 +1,10 @@
 import { useQuery, useClient } from '@urql/preact';
+import { Suspense } from 'preact/compat';
 import { useState, useEffect, useRef, useMemo, useContext, useReducer } from 'preact/hooks';
 import { valid as semverValid, clean as semverClean, inc as semverInc, prerelease as semverPrerelease } from 'es-semver';
 import AccessTokenContext from './AccessTokenContext';
-// TODO: importing this from node modules is broken...
-// How is this reflected in the dist build?!
-import { MarkdownIt } from 'esm.markdown-it/esm.markdown-it.esm.js';
 import Logo from './Logo';
+import MarkdownPreview from './MarkdownPreview';
 
 export default function RepoBranch({ login, repo, branch }) {
     const [result] = useQuery({
@@ -260,14 +259,11 @@ function ReleaseForm({ login, repo, branch, pkgJson, latestCommit }) {
     )
 }
 
-const markdown = new MarkdownIt();
-
-function linkIt(repo, content) {
-    return content
-        .replace(/#([0-9]+)/g, (fullMatch, no) => `[${fullMatch}](https://github.com/preactjs/${repo}/issues/${no})`)
-        .replace(/@([a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38})/gi, (fullMatch, login) => `[${fullMatch}](https://github.com/${login})`)
-}
-
+const markdownFallback = (
+    <div class="flex-1 text-gray-600 markdown-body p-4 flex justify-center items-center self-center" >
+        <Logo width={64} height={64} />
+    </div>
+)
 function ChangelogEditor({ repo, pullRequests }) {
     const initialContent = useMemo(() => {
         let content = '';
@@ -282,8 +278,10 @@ function ChangelogEditor({ repo, pullRequests }) {
 
     return (
         <div class="flex items-stretch w-full max-w-5xl bg-white rounded-md p-4" >
-            <textarea class="flex-1 bg-transparent p-4 text-gray-900 mr-4 border-r font-mono text-sm leading-relaxed" value={content} onInput={(e) => setContent(e.target.value)} />
-            <div class="flex-1 text-gray-600 markdown-body p-4" dangerouslySetInnerHTML={{__html: markdown.render(linkIt(repo, content))}} />
+            <textarea style={{ minHeight: '24rem' }} class="flex-1 bg-transparent p-4 text-gray-900 mr-4 border-r font-mono text-sm leading-relaxed" value={content} onInput={(e) => setContent(e.target.value)} />
+            <Suspense fallback={markdownFallback}>
+                <MarkdownPreview class="flex-1 text-gray-600 markdown-body p-4" repo={repo} markdown={content} />
+            </Suspense>
         </div>
     )
 }
