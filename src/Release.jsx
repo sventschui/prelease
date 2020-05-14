@@ -1,6 +1,5 @@
 import { useQuery, useClient } from '@urql/preact';
 import { useState, useEffect, useRef, useMemo, useContext, useReducer } from 'preact/hooks';
-import Commits from './Commits';
 import { valid as semverValid, clean as semverClean, inc as semverInc, prerelease as semverPrerelease } from 'es-semver';
 import AccessTokenContext from './AccessTokenContext';
 // TODO: importing this from node modules is broken...

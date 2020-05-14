@@ -1,28 +1,5 @@
-import { useQuery, useClient } from '@urql/preact';
-import { useState, useEffect, useRef } from 'preact/hooks';
-import Commits from './Commits';
-import { useMemo } from 'preact/hooks/dist/hooks.module';
-
-/*
-
-                tags: refs(refPrefix: "refs/tags/", first: 15, orderBy: { field: TAG_COMMIT_DATE, direction: DESC}) {
-                    edges {
-                        node {
-                            __typename
-                            id
-                            name
-                            target {
-                                id
-                                oid
-                                ... on Tag {
-                                    name
-                                    message
-                                }
-                            }
-                        }
-                    }
-                }
-            */
+import { useQuery } from '@urql/preact';
+import { useState } from 'preact/hooks';
 
 export default function Repo({ login, repo }) {
     const [query, setQuery] = useState('');

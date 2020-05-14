@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'preact/hooks';
 
-const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1;
-
 function Ellipse({ fg, deg, offset }) {
     let gapLength = Math.sin((offset / 500) * Math.PI) * 30 + 60;
     let lineLength = 894 / 2 - gapLength;

@@ -1,9 +1,5 @@
-import { useQuery, useClient } from '@urql/preact';
+import { useQuery } from '@urql/preact';
 import { useMemo } from 'preact/hooks';
-
-function stripEmojies(str) {
-    return str && str.replace(/:[a-z0-9_]+:/g, '');
-}
 
 export default function OrganizationSelection() {
     const [result] = useQuery({

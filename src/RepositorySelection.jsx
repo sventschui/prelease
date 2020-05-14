@@ -1,4 +1,4 @@
-import { useQuery, useClient } from '@urql/preact';
+import { useQuery } from '@urql/preact';
 import { useState } from 'preact/hooks';
 
 function stripEmojies(str) {
