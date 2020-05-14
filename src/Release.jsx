@@ -5,7 +5,7 @@ import { valid as semverValid, clean as semverClean, inc as semverInc, prereleas
 import AccessTokenContext from './AccessTokenContext';
 // TODO: importing this from node modules is broken...
 // How is this reflected in the dist build?!
-import { MarkdownIt } from 'https://unpkg.com/esm.markdown-it@8.5.0/esm.markdown-it.esm.js';
+import { MarkdownIt } from 'esm.markdown-it/esm.markdown-it.esm.js';
 import Logo from './Logo';
 
 export default function RepoBranch({ login, repo, branch }) {
