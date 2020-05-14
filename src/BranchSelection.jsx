@@ -71,25 +71,24 @@ export default function Repo({ login, repo }) {
           setQuery(e.target.value);
         }}
       />
-      <ul class="mx-auto my-4 w-full max-w-xs flex flex-col list-none items-center">
-        {!result.fetching && result.data ? (
-          <>
-            {query === "" && (
-              <Fragment key="__default">
-                <li key="__default" class="w-full h-16">
-                  <a
-                    href={`/org/${login}/repo/${repo}/branch?branch=${result.data.repository.defaultBranchRef.name}`}
-                    class={`flex items-center h-full hover:bg-indigo-100 hover:text-indigo-800 cursor-pointer bg-white text-gray-700 py-4 px-8 border-b border-gray-300 rounded`}
-                  >
-                    <span class="block font-medium">
-                      {result.data.repository.defaultBranchRef.name}{" "}
-                      <span class="text-gray-500 font-light">(default)</span>
-                    </span>
-                  </a>
-                </li>
-                <div class="h-4" />
-              </Fragment>
-            )}
+      {!result.fetching && result.data ? (
+        <>
+          {query === "" && (
+            <ul class="mx-auto my-4 w-full max-w-xs flex flex-col list-none items-center">
+              <li key="__default" class="w-full h-16">
+                <a
+                  href={`/org/${login}/repo/${repo}/branch?branch=${result.data.repository.defaultBranchRef.name}`}
+                  class={`flex items-center h-full hover:bg-indigo-100 hover:text-indigo-800 cursor-pointer bg-white text-gray-700 py-4 px-8 border-b border-gray-300 rounded`}
+                >
+                  <span class="block font-medium">
+                    {result.data.repository.defaultBranchRef.name}{" "}
+                    <span class="text-gray-506 font-light">(default)</span>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          )}
+          <ul class="mx-auto my-4 w-full max-w-xs flex flex-col list-none items-center">
             {result.data.repository.branches.edges.map(
               ({ node: branch }, index, { length }) => (
                 <li key={branch.id} class="w-full h-16">
@@ -105,7 +104,7 @@ export default function Repo({ login, repo }) {
                         result.data.repository.defaultBranchRef.name && (
                         <>
                           {" "}
-                          <span class="text-gray-500 font-light">
+                          <span class="text-gray-600 font-light">
                             (default)
                           </span>
                         </>
@@ -115,24 +114,25 @@ export default function Repo({ login, repo }) {
                 </li>
               )
             )}
-          </>
-        ) : (
-          <>
-            {query === "" && (
-              <Fragment key="__default">
-                <li key="__default" class="w-full h-16">
+          </ul>
+        </>
+      ) : (
+        <>
+          {query === "" && (
+            <ul class="mx-auto my-4 w-full max-w-xs flex flex-col list-none items-center">
+              <li key="__default" class="w-full h-16">
+                <span
+                  class={`flex items-center h-full bg-white text-gray-700 py-4 px-8 border-b border-gray-300 rounded`}
+                >
                   <span
-                    class={`flex items-center h-full bg-white text-gray-700 py-4 px-8 border-b border-gray-300 rounded`}
-                  >
-                    <span
-                      class="inline-block bg-gray-200 h-4"
-                      style={{ width: `80px` }}
-                    />
-                  </span>
-                </li>
-                <div class="h-4" />
-              </Fragment>
-            )}
+                    class="inline-block bg-gray-200 h-4"
+                    style={{ width: `80px` }}
+                  />
+                </span>
+              </li>
+            </ul>
+          )}
+          <ul class="mx-auto my-4 w-full max-w-xs flex flex-col list-none items-center">
             {[1, 2, 3, 4, 5].map((i, index, { length }) => (
               <li key={i} class="w-full h-16">
                 <span
@@ -147,9 +147,9 @@ export default function Repo({ login, repo }) {
                 </span>
               </li>
             ))}
-          </>
-        )}
-      </ul>
+          </ul>
+        </>
+      )}
     </div>
   );
 }
