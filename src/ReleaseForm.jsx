@@ -1,5 +1,12 @@
 import { useQuery } from "@urql/preact";
-import { useState, useMemo } from "preact/hooks";
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useContext,
+  useReducer,
+  useRef,
+} from "preact/hooks";
 import {
   valid as semverValid,
   clean as semverClean,
@@ -10,6 +17,7 @@ import Logo from "./Logo";
 import gql from "graphql-tag";
 import useChangelog from "./useChangelog";
 import ChangelogEditor from "./ChangelogEditor";
+import AccessTokenContext from "./AccessTokenContext";
 
 export default function ReleaseForm({
   login,
@@ -98,6 +106,81 @@ export default function ReleaseForm({
     from: currentTag && `refs/tags/${currentTag.name}`,
     to: `refs/heads/${branch}`,
   });
+
+  const [content, setContent] = useState(null);
+  useEffect(() => {
+    let content = "";
+
+    changelog.pullRequests &&
+      changelog.pullRequests.forEach((pr) => {
+        content += `- ${pr.title} (#${pr.number}, thanks @${pr.author.login})\n`;
+      });
+
+    setContent(content);
+  }, [changelog, setContent]);
+
+  const accessToken = useContext(AccessTokenContext);
+  const [releaseItState, releaseItDispatch] = useReducer(
+    (state, { type, error }) => {
+      switch (type) {
+        case "start":
+          return { loading: true, error: null, success: false };
+        case "success":
+          return { loading: false, error: null, success: true };
+        case "error":
+          return { loading: false, error, success: false };
+        default:
+          throw new Error("Unknwon action type " + type);
+      }
+    },
+    {
+      loading: false,
+      error: null,
+      success: false,
+    }
+  );
+  const releaseItDispatchRef = useRef(null);
+  releaseItDispatchRef.current = releaseItDispatch;
+  async function releaseIt(e) {
+    e.preventDefault();
+
+    releaseItDispatchRef.current({ type: "start" });
+
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${login}/${repo}/dispatches`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            event_type: "prelease",
+            client_payload: {
+              latest_commit_sha: latestCommit.oid,
+              branch,
+              version,
+              title: releaseTitle,
+              changelog: content,
+            },
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        releaseItDispatchRef.current({
+          type: "error",
+          error: `Repository dispatch returned status ${res.status}`,
+        });
+        return;
+      }
+
+      releaseItDispatchRef.current({ type: "success" });
+    } catch (error) {
+      releaseItDispatchRef.current({ type: "error", error });
+    }
+  }
 
   if (currentTagResult.error) {
     console.log(currentTagResult.error);
@@ -198,7 +281,8 @@ export default function ReleaseForm({
       <ChangelogEditor
         login={login}
         repo={repo}
-        pullRequests={changelog.pullRequests}
+        content={content}
+        onContentChange={setContent}
       />
       <p class="mb-2 mt-6">What sort of release shall this be?</p>
       <div class="flex w-full max-w-md ">
@@ -258,14 +342,29 @@ export default function ReleaseForm({
 
       <button
         class={`bg-white shadow rounded px-4 py-2 my-4 ${
-          version === "" || !validSemver || releaseTitle === ""
+          releaseItState.loading ||
+          version === "" ||
+          !validSemver ||
+          releaseTitle === ""
             ? "text-gray-400"
             : "text-indigo-800 "
         }`}
-        disabled={version === "" || !validSemver || releaseTitle === ""}
+        disabled={
+          releaseItState.loading ||
+          version === "" ||
+          !validSemver ||
+          releaseTitle === ""
+        }
+        onClick={releaseIt}
       >
-        Release it!
+        {releaseItState.loading ? "Releasing..." : "Release it!"}
       </button>
+      {releaseItState.error && (
+        <p>
+          Something bad happened!{" "}
+          {releaseItState.error.stack || releaseItState.error}
+        </p>
+      )}
     </>
   );
 }

@@ -9,25 +9,19 @@ const markdownFallback = (
   </div>
 );
 
-export default function ChangelogEditor({ login, repo, pullRequests }) {
-  const initialContent = useMemo(() => {
-    let content = "";
-
-    pullRequests.forEach((pr) => {
-      content += `- ${pr.title} (#${pr.number}, thanks @${pr.author.login})\n`;
-    });
-
-    return content;
-  }, [pullRequests]);
-  const [content, setContent] = useState(initialContent);
-
+export default function ChangelogEditor({
+  login,
+  repo,
+  content,
+  onContentChange,
+}) {
   return (
     <div class="flex items-stretch w-full max-w-5xl bg-white rounded-md p-4">
       <textarea
         style={{ minHeight: "24rem" }}
         class="flex-1 bg-transparent p-4 text-gray-900 mr-4 border-r font-mono text-sm leading-relaxed"
         value={content}
-        onInput={(e) => setContent(e.target.value)}
+        onInput={(e) => onContentChange(e.target.value)}
       />
       <Suspense fallback={markdownFallback}>
         <MarkdownPreview
