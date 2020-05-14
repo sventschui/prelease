@@ -365,6 +365,8 @@ function useChangelog({ repo, from, to }) {
                     }
                 }
                 `).join('')
+                
+                // TODO: this GQL fragment is dynamically assembled and therefore parsed in browser, not super nice...
                 const assocPrResult = await client.query(
                     `query Q($repo: String!) {
                         repository(
