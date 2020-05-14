@@ -2,7 +2,6 @@ import { render } from 'preact'
 import 'preact/devtools';
 import { useState, useMemo, useEffect, useRef } from 'preact/hooks';
 import mitt from 'mitt';
-import { createClient, defaultExchanges, Provider } from '@urql/preact';
 import './index.css'
 import App from './src/App';
 import AccessTokenContext from './src/AccessTokenContext';
@@ -18,28 +17,6 @@ window.handleTokenError = (token) => {
   // use a ref since this is called async and setAccessToken is/might be stale...
   atEmitter.emit('error', token);
 }
-
-// TODO: find a way for a silent login...
-/*
-const debug = true;
-const frameStyle = debug ? {
-  height: '100px',
-  width: '100px',
-} : { height: '0', width: '0' };
-function buildSilentLoginView(atOrNull) {
-  if (atOrNull) {
-    return null;
-  }
-
-  function onLoad() {
-    console.log('frame onLoad');
-  }
-
-  return (
-    <iframe style={frameStyle} onLoad={onLoad} src="/.netlify/functions/auth" />
-  )
-}
-*/
 
 function useGithubAuth() {
   const [accessToken, setAccessToken] = useState(currentAccessToken);
@@ -107,31 +84,16 @@ function useGithubAuth() {
   };
 }
 
-function Main(props) {
+function Main() {
   const { loggingIn, accessToken, openLoginWindow, error } = useGithubAuth();
-  const client = useMemo(() => {
-    if (!accessToken) {
-      return null;
-    }
-
-    return createClient({
-      url: 'https://api.github.com/graphql',
-      exchanges: defaultExchanges,
-      fetchOptions: (...args) => {
-        return { headers: { Authorization: `Bearer ${accessToken}` }};
-      }
-    });
-  }, [accessToken])
 
   return (
     <>
       <h1 class="text-5xl text-center">prelease!</h1>
       <p class="text-sm text-center">please release, preact release, painless release, prelease! 🤣</p>
-      {client ? (
+      {accessToken ? (
         <AccessTokenContext.Provider value={accessToken} >
-          <Provider value={client} >
-            <App />
-          </Provider>
+          <App />
         </AccessTokenContext.Provider>
       ) : (
         error ? (
