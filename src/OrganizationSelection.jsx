@@ -1,5 +1,6 @@
 import { useQuery, useClient } from '@urql/preact';
 import { useMemo } from 'preact/hooks';
+import gql from 'graphql-tag';
 
 function stripEmojies(str) {
     return str && str.replace(/:[a-z0-9_]+:/g, '');
@@ -7,7 +8,7 @@ function stripEmojies(str) {
 
 export default function OrganizationSelection() {
     const [result] = useQuery({
-        query: `
+        query: gql`
         {
             viewer {
                 id

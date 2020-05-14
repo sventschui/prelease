@@ -10,6 +10,8 @@
   },
   "browserslist": "> 1%, last 2 versions",
   "dependencies": {
+    "babel-plugin-graphql-tag": "^2.5.0",
+    "graphql-tag": "^2.10.3",
     "simple-oauth2": "^3.4.0"
   },
   "devDependencies": {

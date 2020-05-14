@@ -6,11 +6,12 @@ import AccessTokenContext from './AccessTokenContext';
 // TODO: importing this from node modules is broken...
 // How is this reflected in the dist build?!
 import { MarkdownIt } from 'esm.markdown-it/esm.markdown-it.esm.js';
+import gql from 'graphql-tag';
 import Logo from './Logo';
 
 export default function RepoBranch({ login, repo, branch }) {
     const [result] = useQuery({
-        query: `
+        query: gql`
         query Q($login: String!, $repo: String!, $qualifiedRefName: String!, $expression: String!) {
             repository(
                 owner: $login
@@ -106,7 +107,7 @@ function ReleaseForm({ login, repo, branch, pkgJson, latestCommit }) {
     }
 
     const [currentTagResult] = useQuery({
-        query: `
+        query: gql`
         query Q($login: String!, $repo: String!, $qName: String!, $qNameWithV: String!) {
             repository(
                 owner: $login

@@ -1,5 +1,6 @@
 import { useQuery, useClient } from '@urql/preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
+import gql from 'graphql-tag';
 import Commits from './Commits';
 import { useMemo } from 'preact/hooks/dist/hooks.module';
 
@@ -27,7 +28,7 @@ import { useMemo } from 'preact/hooks/dist/hooks.module';
 export default function Repo({ login, repo }) {
     const [query, setQuery] = useState('');
     const [result] = useQuery({
-        query: `
+        query: gql`
         query Q($login: String!, $repo: String!, $query: String) {
             repository(
                 owner: $login
