@@ -1,6 +1,5 @@
 import prefresh from "@prefresh/vite";
 import { parse } from "graphql";
-import path from "path";
 
 const analyze = Boolean(process.env.ANALYZE);
 
@@ -42,6 +41,11 @@ export default {
       ],
     },
   ],
+  shouldPreload(chunk) {
+    return chunk.fileName.match(
+      /^(UrqlProvider-[a-z0-9]+\.js|urql-preact-[a-z0-9]+\.js)$/i
+    );
+  },
   rollupInputOptions: {
     plugins: [
       require("@rollup/plugin-replace")({

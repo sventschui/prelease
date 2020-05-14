@@ -23,6 +23,7 @@
   "browserslist": "> 1%, last 2 versions",
   "dependencies": {
     "@rollup/plugin-alias": "^3.1.0",
+    "rollup-plugin-modulepreload": "^1.2.2",
     "simple-oauth2": "^3.4.0"
   },
   "devDependencies": {
@@ -43,7 +44,7 @@
     "rollup-plugin-visualizer": "^4.0.4",
     "serve": "^11.3.0",
     "tailwindcss": "^1.4.6",
-    "vite": "sventschui/vite#feature/prioritize-mjs-files-with-dist",
+    "vite": "sventschui/vite#feature/should-preload-0.14.4-with-dist",
     "yorkie": "^2.0.0"
   }
 }
