@@ -4,12 +4,13 @@
   "scripts": {
     "dev": "CLIENT_ID=bef8f01982247883d379 CLIENT_SECRET=0288a6a278515ba6260398764de7f1fc1c1ae452 netlify dev",
     "dev:vite": "vite --jsx preact",
-    "build": "vite build --jsx preact && cp _redirects dist/",
-    "dev:serve": "CLIENT_ID=bef8f01982247883d379 CLIENT_SECRET=0288a6a278515ba6260398764de7f1fc1c1ae452 netlify dev -c 'yarn serve:dist'",
+    "build": "vite build --jsx preact",
+    "dev:dist": "CLIENT_ID=bef8f01982247883d379 CLIENT_SECRET=0288a6a278515ba6260398764de7f1fc1c1ae452 netlify dev -c 'yarn serve:dist'",
     "serve:dist": "serve --single --listen 3000 dist/"
   },
   "browserslist": "> 1%, last 2 versions",
   "dependencies": {
+    "@rollup/plugin-alias": "^3.1.0",
     "simple-oauth2": "^3.4.0"
   },
   "devDependencies": {
