@@ -116,7 +116,6 @@ function ReleaseForm({ login, repo, branch, pkgJson, latestCommit }) {
 
   const onChangeReleaseType = (e) => {
     const type = e.target.value;
-    console.log("change to", type);
 
     if (type !== "custom") {
       setVersion(semverInc(cleanedTag, type));
