@@ -1,9 +1,10 @@
 import { useQuery } from '@urql/preact';
 import { useMemo } from 'preact/hooks';
+import gql from 'graphql-tag';
 
 export default function OrganizationSelection() {
     const [result] = useQuery({
-        query: `
+        query: gql`
         {
             viewer {
                 id

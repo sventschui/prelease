@@ -1,11 +1,12 @@
 import { useQuery } from '@urql/preact';
 import { useState } from 'preact/hooks';
+import gql from 'graphql-tag';
 
 export default function Repo({ login, repo }) {
     const [query, setQuery] = useState('');
     const [result] = useQuery({
-        query: `
-        query Q($login: String!, $repo: String!, $query: String) {
+        query: gql`
+        query ($login: String!, $repo: String!, $query: String) {
             repository(
                 owner: $login
                 name: $repo

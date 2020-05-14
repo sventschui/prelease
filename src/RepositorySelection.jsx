@@ -1,14 +1,15 @@
 import { useQuery } from '@urql/preact';
 import { useState } from 'preact/hooks';
+import gql from 'graphql-tag';
 
 function stripEmojies(str) {
     return str && str.replace(/:[a-z0-9_]+:/g, '');
 }
 
-export default function RepoList({ login }) {
+export default function RepositorySelection({ login }) {
     const [query, setQuery] = useState('');
     const [result] = useQuery({
-        query: `
+        query: gql`
         query RepositorySearch($query: String!) {
             repositories: search(type: REPOSITORY, query: $query, first: 15) {
                 edges {
@@ -26,7 +27,7 @@ export default function RepoList({ login }) {
         variables: { query: `${query} user:${login}` },
     })
     const [pinnedReposResult] = useQuery({
-        query: `
+        query: gql`
         query PinnedRepositories($login: String!) {
             repositoryOwner(login: $login) {
                 ... on User {

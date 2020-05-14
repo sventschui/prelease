@@ -1,8 +1,9 @@
 import { useQuery } from '@urql/preact';
+import gql from 'graphql-tag';
 
 export default function Commits({ name, qualifiedRefName }) {
     const [result] = useQuery({
-        query: `
+        query: gql`
         query Q($name: String!, $qualifiedRefName: String!) {
             repository(
                 owner: "preactjs"

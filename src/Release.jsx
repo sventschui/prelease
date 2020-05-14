@@ -5,10 +5,11 @@ import { valid as semverValid, clean as semverClean, inc as semverInc, prereleas
 import AccessTokenContext from './AccessTokenContext';
 import Logo from './Logo';
 import MarkdownPreview from './MarkdownPreview';
+import gql from 'graphql-tag';
 
-export default function RepoBranch({ login, repo, branch }) {
+export default function Release({ login, repo, branch }) {
     const [result] = useQuery({
-        query: `
+        query: gql`
         query Q($login: String!, $repo: String!, $qualifiedRefName: String!, $expression: String!) {
             repository(
                 owner: $login
@@ -104,7 +105,7 @@ function ReleaseForm({ login, repo, branch, pkgJson, latestCommit }) {
     }
 
     const [currentTagResult] = useQuery({
-        query: `
+        query: gql`
         query Q($login: String!, $repo: String!, $qName: String!, $qNameWithV: String!) {
             repository(
                 owner: $login
