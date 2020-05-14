@@ -8,6 +8,9 @@ export default {
     // TODO: get rid of relative path...
     "graphql/language/parser": "../../../../graphql-parser-noop.js",
   },
+  optimizeDeps: {
+    include: [], // optimizing deps will result in node.js OOM
+  },
   plugins: [
     prefresh(),
     {
