@@ -280,7 +280,11 @@ function ReleaseForm({ login, repo, branch, pkgJson, latestCommit }) {
           setReleaseTitle(e.target.value);
         }}
       />
-      <ChangelogEditor repo={repo} pullRequests={changelog.pullRequests} />
+      <ChangelogEditor
+        login={login}
+        repo={repo}
+        pullRequests={changelog.pullRequests}
+      />
       <p class="mb-2 mt-6">What sort of release shall this be?</p>
       <div class="flex w-full max-w-md ">
         {[
@@ -356,7 +360,7 @@ const markdownFallback = (
     <Logo width={64} height={64} />
   </div>
 );
-function ChangelogEditor({ repo, pullRequests }) {
+function ChangelogEditor({ login, repo, pullRequests }) {
   const initialContent = useMemo(() => {
     let content = "";
 
@@ -379,6 +383,7 @@ function ChangelogEditor({ repo, pullRequests }) {
       <Suspense fallback={markdownFallback}>
         <MarkdownPreview
           class="flex-1 text-gray-600 markdown-body p-4"
+          login={login}
           repo={repo}
           markdown={content}
         />
@@ -429,7 +434,7 @@ function useChangelog({ login, repo, from, to }) {
         const foundPrs = new Map();
 
         const res = await fetch(
-          `https://api.github.com/repos/preactjs/${repo}/compare/${from}...${to}`,
+          `https://api.github.com/repos/${login}/${repo}/compare/${from}...${to}`,
           {
             headers: {
               Authorization: `Bearer ${at}`,

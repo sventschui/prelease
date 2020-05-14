@@ -21,20 +21,20 @@ window.addEventListener("load", () => {
   }
 });
 
-function linkIt(repo, content) {
+function linkIt(login, repo, content) {
   return content
     .replace(
       /#([0-9]+)/g,
       (fullMatch, no) =>
-        `[${fullMatch}](https://github.com/preactjs/${repo}/issues/${no})`
+        `[${fullMatch}](https://github.com/${login}/${repo}/issues/${no})`
     )
     .replace(
       /@([a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38})/gi,
-      (fullMatch, login) => `[${fullMatch}](https://github.com/${login})`
+      (fullMatch, user) => `[${fullMatch}](https://github.com/${user})`
     );
 }
 
-export default function MarkdownPreview({ class: cls, repo, markdown }) {
+export default function MarkdownPreview({ class: cls, login, repo, markdown }) {
   if (!markdownItLoadingPromise) {
     markdownItLoadingPromise = loadMarkdownIt();
   }
@@ -51,7 +51,7 @@ export default function MarkdownPreview({ class: cls, repo, markdown }) {
     <div
       class={cls}
       dangerouslySetInnerHTML={{
-        __html: markdownIt.render(linkIt(repo, markdown)),
+        __html: markdownIt.render(linkIt(login, repo, markdown)),
       }}
     />
   );
