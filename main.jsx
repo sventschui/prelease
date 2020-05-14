@@ -39,12 +39,6 @@ function useGithubAuth() {
   }, []);
 
   useEffect(() => {
-    if (!accessToken && !loginWindowRef.current) {
-      return openLoginWindow();
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
     atEmitter.on("change", setAccessToken);
     atEmitter.on("error", setError);
 
