@@ -47,7 +47,12 @@ export default function OrganizationSelection() {
                     index === 0 ? "rounded-t" : ""
                   } ${index === length - 1 ? "rounded-b" : ""}`}
                 >
-                  <img class="w-8 h-8 rounded-md mr-4" src={owner.avatarUrl} />
+                  <img
+                    class="w-8 h-8 rounded-md mr-4"
+                    alt=""
+                    role="presentation"
+                    src={owner.avatarUrl}
+                  />
                   <span class="block font-medium flex-1">{owner.login}</span>
                 </a>
               </li>
@@ -70,13 +75,12 @@ export default function OrganizationSelection() {
       </ul>
       {items && (
         <p class="w-full max-w-md text-center mx-auto text-sm">
-          Not seeing your organization? Grant/request access to the desired org
-          for the prelease app{" "}
+          Not seeing your organization?{" "}
           <a
             href="https://github.com/settings/connections/applications/bef8f01982247883d379"
             class="underline"
           >
-            here
+            Grant/request access to the desired org for the prelease app
           </a>
           .
         </p>
