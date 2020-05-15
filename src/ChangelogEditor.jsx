@@ -25,7 +25,7 @@ export default function ChangelogEditor({
       />
       <Suspense fallback={markdownFallback}>
         <MarkdownPreview
-          class="flex-1 text-gray-600 markdown-body p-4"
+          class="flex-1 text-gray-700 markdown-body p-4"
           login={login}
           repo={repo}
           markdown={content}

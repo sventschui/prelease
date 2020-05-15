@@ -66,6 +66,7 @@ export default function RepositorySelection({ login }) {
       </h2>
       <input
         type="search"
+        aria-label="Filter repositories"
         placeholder="Filter repositories"
         class="block mx-auto text-gray-800 rounded py-2 px-4"
         value={query}
