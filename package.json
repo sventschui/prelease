@@ -6,7 +6,7 @@
     "dev:vite": "vite --jsx preact",
     "build": "vite build --jsx preact",
     "dev:dist": "CLIENT_ID=bef8f01982247883d379 CLIENT_SECRET=0288a6a278515ba6260398764de7f1fc1c1ae452 netlify dev -c 'yarn serve:dist'",
-    "serve:dist": "serve --single --listen 3000 dist/",
+    "serve:dist": "servor dist/ index.html 3000",
     "pretty": "prettier --write '**/*.jsx' '**/*.js'"
   },
   "gitHooks": {
@@ -41,7 +41,7 @@
     "preact-router": "^3.2.1",
     "prettier": "^2.0.5",
     "rollup-plugin-visualizer": "^4.0.4",
-    "serve": "^11.3.0",
+    "servor": "^3.3.1",
     "tailwindcss": "^1.4.6",
     "vite": "sventschui/vite#feature/should-preload-with-dist",
     "yorkie": "^2.0.0"
