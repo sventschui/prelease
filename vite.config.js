@@ -8,9 +8,6 @@ export default {
     // TODO: get rid of relative path...
     "graphql/language/parser": "../../../../graphql-parser-noop.js",
   },
-  optimizeDeps: {
-    include: [], // optimizing deps will result in node.js OOM
-  },
   plugins: [
     prefresh(),
     {
@@ -45,9 +42,7 @@ export default {
     },
   ],
   shouldPreload(chunk) {
-    return chunk.fileName.match(
-      /^(UrqlProvider-[a-z0-9]+\.js|urql-preact-[a-z0-9]+\.js)$/i
-    );
+    return chunk.fileName.match(/^routes-[a-z0-9]+\.js$/i);
   },
   rollupInputOptions: {
     plugins: [

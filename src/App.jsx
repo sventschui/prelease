@@ -3,11 +3,19 @@ import { Router } from "preact-router";
 import { Suspense, lazy } from "preact/compat";
 import Logo from "./Logo";
 
-const OrganizationSelection = lazy(() => import("./OrganizationSelection"));
-const RepositorySelection = lazy(() => import("./RepositorySelection"));
-const BranchSelection = lazy(() => import("./BranchSelection"));
-const Release = lazy(() => import("./Release"));
-const UrqlProvider = lazy(() => import("./UrqlProvider"));
+const OrganizationSelection = lazy(() =>
+  import("./routes").then(({ OrganizationSelection }) => OrganizationSelection)
+);
+const RepositorySelection = lazy(() =>
+  import("./routes").then(({ RepositorySelection }) => RepositorySelection)
+);
+const BranchSelection = lazy(() =>
+  import("./routes").then(({ BranchSelection }) => BranchSelection)
+);
+const Release = lazy(() => import("./routes").then(({ Release }) => Release));
+const UrqlProvider = lazy(() =>
+  import("./routes").then(({ UrqlProvider }) => UrqlProvider)
+);
 
 const fallback = (
   <div class="flex flex-col items-center mt-16">
